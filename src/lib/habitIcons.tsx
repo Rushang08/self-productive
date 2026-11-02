@@ -1,5 +1,5 @@
 import {
-  Activity, AlarmClock, Apple, BedDouble, BookOpen, Brain, Camera, CigaretteOff, Code, Coffee, Dog, Droplets,
+  Activity, AlarmClock, Apple, Baby, CalendarHeart, HeartHandshake, Stethoscope, Thermometer, Wind, BedDouble, BookOpen, Brain, Camera, CigaretteOff, Code, Coffee, Dog, Droplets,
   Dumbbell, Flower2, Footprints, Heart, Languages, Laptop, Moon, Mountain, Music, PenLine, Pill, PhoneOff,
   Salad, ShowerHead, Smile, Sparkles, Sprout, Sun, Target, Utensils, Wallet, Bike,
   type LucideIcon,
@@ -39,6 +39,12 @@ export const HABIT_ICONS: Record<string, LucideIcon> = {
   dog: Dog,
   wallet: Wallet,
   smile: Smile,
+  baby: Baby,
+  thermometer: Thermometer,
+  calendar: CalendarHeart,
+  handshake: HeartHandshake,
+  wind: Wind,
+  stethoscope: Stethoscope,
   target: Target,
 }
 

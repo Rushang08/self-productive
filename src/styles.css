@@ -1193,3 +1193,85 @@ button.habit:active {
     animation: none;
   }
 }
+
+/* ---------- templates ---------- */
+.sheet .group {
+  background: var(--paper);
+  box-shadow: none;
+}
+.sheet .tile {
+  background: color-mix(in srgb, var(--hc) 13%, var(--paper));
+}
+.tpl-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tpl-section .section-title {
+  margin: 0 4px;
+}
+.tpl-row,
+.tpl-item {
+  --hc: var(--accent);
+  --hc-fg: color-mix(in srgb, var(--hc), var(--lift) var(--lift-pct));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  text-align: left;
+}
+.tpl-row + .tpl-row,
+.tpl-item + .tpl-item {
+  border-top: 1px solid var(--hairline);
+}
+.tpl-row:active {
+  background: var(--press);
+}
+.tpl-item .habit-text small {
+  white-space: normal;
+}
+.tpl-back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 2px;
+  margin: -4px 0 -8px -4px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+.tpl-note {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.add-pill {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hairline-2);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+.add-pill:active:not(:disabled) {
+  background: var(--press);
+}
+.add-pill.added {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  opacity: 1;
+}
+.tpl-row .habit-text strong,
+.tpl-item .habit-text strong {
+  white-space: normal;
+}

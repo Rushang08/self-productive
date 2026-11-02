@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { ChevronRight, Download, GripVertical, LogOut, Plus } from 'lucide-react'
+import { ChevronRight, Download, GripVertical, LogOut, Plus, Sparkles } from 'lucide-react'
 import type { User } from 'firebase/auth'
 import { useData } from '../hooks/useData'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
@@ -8,6 +8,7 @@ import { fmt } from '../lib/score'
 import { HabitIcon } from '../lib/habitIcons'
 import type { Habit } from '../lib/types'
 import { HabitForm } from '../components/HabitForm'
+import { TemplatesSheet } from '../components/TemplatesSheet'
 import { Avatar } from '../components/Avatar'
 
 function Row({ habit, onEdit, onDrop }: { habit: Habit; onEdit: () => void; onDrop: () => void }) {
@@ -52,6 +53,7 @@ export function ManagePage({ user, onSignOut }: Props) {
   const latest = useRef(items)
   const [editing, setEditing] = useState<Habit | null>(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [browsing, setBrowsing] = useState(false)
 
   useEffect(() => {
     setItems(habits)
@@ -88,6 +90,9 @@ export function ManagePage({ user, onSignOut }: Props) {
         <button className="group-add" onClick={() => open(null)}>
           <Plus size={18} /> New habit
         </button>
+        <button className="group-add" onClick={() => setBrowsing(true)}>
+          <Sparkles size={18} /> Browse templates
+        </button>
       </div>
       <p className="hint">Drag the handle to reorder. Tap a habit to edit it.</p>
 
@@ -112,6 +117,7 @@ export function ManagePage({ user, onSignOut }: Props) {
       {iosHint && <p className="hint">To install on iPhone: tap Share, then “Add to Home Screen”.</p>}
 
       <HabitForm open={formOpen} habit={editing} onClose={() => setFormOpen(false)} />
+      <TemplatesSheet open={browsing} onClose={() => setBrowsing(false)} />
     </div>
   )
 }

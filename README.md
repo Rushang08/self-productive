@@ -6,6 +6,8 @@ A mobile-first daily habit tracker. Google sign-in, Firebase Firestore sync (off
 Add your own from the **Today** or **Habits** tab: a Yes/No habit, or a Target habit with a goal, unit and step size.
 Habits can be edited, reordered (drag the handle) and deleted.
 
+**Templates:** open *Browse templates* on the Today or Habits tab to add ready-made habits one at a time or a whole pack: pregnancy planning (her / him / together), morning routine, fitness, sleep, calm mind, learning, deep work, money and self care. Packs live in `src/lib/templates.ts`.
+
 **Stack:** React 18 + TypeScript + Vite · Framer Motion · Lucide icons · Firebase Auth + Firestore · vite-plugin-pwa
 
 **Design:** warm paper and ink palette with a single deep-green accent, Instrument Serif + Inter (bundled in `public/fonts`, works offline), and automatic light/dark mode. Design tokens live at the top of `src/styles.css`.

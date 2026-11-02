@@ -13,6 +13,8 @@ export interface Habit {
   /** Amount added by the + / − buttons. */
   step: number
   order: number
+  /** Set when the habit was added from the template library. */
+  templateId?: string
   /** YYYY-MM-DD the habit started counting from. */
   createdDate: string
 }

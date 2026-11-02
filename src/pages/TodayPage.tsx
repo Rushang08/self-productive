@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, Plus } from 'lucide-react'
+import { Check, Plus, Sparkles } from 'lucide-react'
 import type { User } from 'firebase/auth'
 import { useData } from '../hooks/useData'
 import { formatLong, greeting } from '../lib/dates'
@@ -9,6 +9,7 @@ import { AnimatedNumber, ProgressRing } from '../components/ProgressRing'
 import { DayStrip } from '../components/DayStrip'
 import { HabitCard } from '../components/HabitCard'
 import { HabitForm } from '../components/HabitForm'
+import { TemplatesSheet } from '../components/TemplatesSheet'
 import { Avatar } from '../components/Avatar'
 
 const list = { hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.04 } } }
@@ -31,6 +32,7 @@ export function TodayPage({ user, today, onOpenAccount }: Props) {
   const { habits, logs, ready, setValue } = useData()
   const [selected, setSelected] = useState(today)
   const [adding, setAdding] = useState(false)
+  const [browsing, setBrowsing] = useState(false)
 
   const day = selected > today ? today : selected
   const active = habits.filter((h) => isActive(h, day))
@@ -104,10 +106,14 @@ export function TodayPage({ user, today, onOpenAccount }: Props) {
           <button className="group-add" onClick={() => setAdding(true)}>
             <Plus size={18} /> Add a habit
           </button>
+          <button className="group-add" onClick={() => setBrowsing(true)}>
+            <Sparkles size={18} /> Browse templates
+          </button>
         </motion.div>
       )}
 
       <HabitForm open={adding} habit={null} onClose={() => setAdding(false)} />
+      <TemplatesSheet open={browsing} onClose={() => setBrowsing(false)} />
     </div>
   )
 }

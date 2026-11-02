@@ -25,6 +25,7 @@ interface DataContextValue {
   error: string | null
   setValue: (date: string, habitId: string, value: number) => void
   saveHabit: (input: HabitInput) => void
+  addHabits: (inputs: HabitInput[]) => void
   removeHabit: (id: string) => void
   reorderHabits: (ids: string[]) => void
 }
@@ -44,6 +45,7 @@ const parseHabit = (id: string, d: Record<string, unknown>): Habit => ({
   step: Number(d.step ?? 1) || 1,
   order: Number(d.order ?? 0),
   createdDate: String(d.createdDate ?? '1970-01-01'),
+  templateId: typeof d.templateId === 'string' ? d.templateId : undefined,
 })
 
 export function DataProvider({ uid, children }: { uid: string; children: ReactNode }) {
@@ -145,6 +147,20 @@ export function DataProvider({ uid, children }: { uid: string; children: ReactNo
     [uid, habits, onError],
   )
 
+  const addHabits = useCallback(
+    (inputs: HabitInput[]) => {
+      if (!inputs.length) return
+      const batch = writeBatch(db)
+      const first = habits.reduce((m, h) => Math.max(m, h.order), -1) + 1
+      const created = todayKey()
+      inputs.forEach(({ id: _id, ...fields }, i) => {
+        batch.set(doc(collection(db, 'users', uid, 'habits')), { ...fields, order: first + i, createdDate: created })
+      })
+      batch.commit().catch(onError)
+    },
+    [uid, habits, onError],
+  )
+
   const removeHabit = useCallback(
     (id: string) => {
       deleteDoc(doc(db, 'users', uid, 'habits', id)).catch(onError)
@@ -169,10 +185,11 @@ export function DataProvider({ uid, children }: { uid: string; children: ReactNo
       error,
       setValue,
       saveHabit,
+      addHabits,
       removeHabit,
       reorderHabits,
     }),
-    [habits, logs, habitsReady, logsReady, error, setValue, saveHabit, removeHabit, reorderHabits],
+    [habits, logs, habitsReady, logsReady, error, setValue, saveHabit, addHabits, removeHabit, reorderHabits],
   )
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>
