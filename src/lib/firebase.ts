@@ -7,12 +7,25 @@ import {
   type Firestore,
 } from 'firebase/firestore'
 
+const DEFAULT_AUTH_DOMAIN = 'self-productive.firebaseapp.com'
+
+/**
+ * Mobile browsers block the third-party storage that Firebase's sign-in handler needs when it lives on
+ * a different domain than the app ("missing initial state"). On our own hosted domain we use that
+ * domain instead; vercel.json proxies /__/auth/* to Firebase. Local dev keeps the default.
+ */
+function authDomain() {
+  const { hostname, host } = window.location
+  const local = hostname === 'localhost' || hostname === '127.0.0.1' || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)
+  return local || hostname === DEFAULT_AUTH_DOMAIN || hostname.endsWith('.web.app') ? DEFAULT_AUTH_DOMAIN : host
+}
+
 // Firebase web config is public by design (it identifies the project, it doesn't grant access).
 // Data is protected by firestore.rules and the Auth authorized-domains list.
 // VITE_FIREBASE_* env vars override these defaults, e.g. to point at another project.
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyBW20f5FUW_BCm1V8uxXFdJ0JjDfpOGt2E',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'self-productive.firebaseapp.com',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || authDomain(),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'self-productive',
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'self-productive.firebasestorage.app',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '263695794440',
