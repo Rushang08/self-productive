@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { ChevronRight, Download, GripVertical, LogOut, Plus, Sparkles } from 'lucide-react'
+import { ChevronRight, Download, GripVertical, LogOut, Plus, RotateCcw, Sparkles } from 'lucide-react'
 import type { User } from 'firebase/auth'
 import { useData } from '../hooks/useData'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import { fmt } from '../lib/score'
+import { DEFAULT_HABITS } from '../lib/defaults'
+import { ALL_DAYS, scheduleLabel } from '../lib/schedule'
 import { HabitIcon } from '../lib/habitIcons'
 import type { Habit } from '../lib/types'
 import { HabitForm } from '../components/HabitForm'
@@ -33,7 +35,10 @@ function Row({ habit, onEdit, onDrop }: { habit: Habit; onEdit: () => void; onDr
         </span>
         <span className="habit-text">
           <strong>{habit.name}</strong>
-          <small>{habit.kind === 'check' ? 'Yes / No' : `Goal: ${fmt(habit.target)} ${habit.unit}`}</small>
+          <small>
+            {habit.kind === 'check' ? 'Yes / No' : `Goal: ${fmt(habit.target)} ${habit.unit}`}
+            {habit.days.length < ALL_DAYS.length && ` · ${scheduleLabel(habit.days)}`}
+          </small>
         </span>
         <ChevronRight size={18} className="chev" />
       </button>
@@ -47,7 +52,7 @@ interface Props {
 }
 
 export function ManagePage({ user, onSignOut }: Props) {
-  const { habits, reorderHabits } = useData()
+  const { habits, reorderHabits, restoreDefaults } = useData()
   const { canInstall, iosHint, install } = useInstallPrompt()
   const [items, setItems] = useState(habits)
   const latest = useRef(items)
@@ -61,6 +66,8 @@ export function ManagePage({ user, onSignOut }: Props) {
   useEffect(() => {
     latest.current = items
   }, [items])
+
+  const missingDefaults = DEFAULT_HABITS.filter((d) => !habits.some((h) => h.id === d.id)).length
 
   const persistOrder = () => {
     const ids = latest.current.map((h) => h.id)
@@ -76,7 +83,7 @@ export function ManagePage({ user, onSignOut }: Props) {
     <div className="page">
       <header className="top">
         <div>
-          <p className="eyebrow">Make it yours</p>
+          <p className="eyebrow">Your daily routine</p>
           <h1 className="display">Habits</h1>
         </div>
       </header>
@@ -93,8 +100,16 @@ export function ManagePage({ user, onSignOut }: Props) {
         <button className="group-add" onClick={() => setBrowsing(true)}>
           <Sparkles size={18} /> Browse templates
         </button>
+        {missingDefaults > 0 && (
+          <button className="list-btn" onClick={restoreDefaults}>
+            <RotateCcw size={18} /> Restore default habits ({missingDefaults})
+          </button>
+        )}
       </div>
-      <p className="hint">Drag the handle to reorder. Tap a habit to edit it.</p>
+      <p className="hint">
+        These repeat automatically, so there is nothing to set up each day. Tap a habit to change its goal or the days it repeats. Drag the
+        handle to reorder.
+      </p>
 
       <h3 className="section-title">Account</h3>
       <div className="group">

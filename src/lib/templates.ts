@@ -1,4 +1,5 @@
 import type { HabitInput } from './types'
+import { ALL_DAYS } from './schedule'
 
 export interface TemplateHabit {
   /** Unique id; stored on the habit so we can show "Added". */
@@ -245,5 +246,6 @@ export const toHabitInput = (t: TemplateHabit): HabitInput => ({
   target: t.target,
   unit: t.unit,
   step: t.step,
+  days: ALL_DAYS,
   templateId: t.id,
 })

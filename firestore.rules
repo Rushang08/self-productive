@@ -1,9 +1,67 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each user can only read/write their own data.
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Deterministic id for a pair of users, smaller uid first.
+    function pairId(a, b) {
+      return a < b ? a + '_' + b : b + '_' + a;
+    }
+
+    function areFriends(other) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/friendships/$(pairId(request.auth.uid, other)))
+        && get(/databases/$(database)/documents/friendships/$(pairId(request.auth.uid, other))).data.status == 'accepted';
+    }
+
+    // Private data: habits, daily logs and settings. Only the owner.
     match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Shared daily scores (0..1 per day, nothing else). The owner and accepted friends can read.
+    match /scores/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || areFriends(uid));
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Lookup by exact email. Doc id is the lowercase email. Single gets only, so emails cannot be listed.
+    match /emailIndex/{email} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update: if signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() == email
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'photo']);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // One document per pair of users: pending request, then accepted.
+    match /friendships/{id} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+
+      allow create: if signedIn()
+        && request.resource.data.members.size() == 2
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members[0] < request.resource.data.members[1]
+        && id == request.resource.data.members[0] + '_' + request.resource.data.members[1]
+        && request.resource.data.requester == request.auth.uid
+        && request.resource.data.status == 'pending';
+
+      // Only the person who received the request can accept it, and nothing else may change.
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.members
+        && resource.data.requester != request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'accepted'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      // Either person can decline, cancel or unfriend.
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
     }
   }
 }

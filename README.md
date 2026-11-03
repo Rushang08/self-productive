@@ -6,6 +6,10 @@ A mobile-first daily habit tracker. Google sign-in, Firebase Firestore sync (off
 Add your own from the **Today** or **Habits** tab: a Yes/No habit, or a Target habit with a goal, unit and step size.
 Habits can be edited, reordered (drag the handle) and deleted.
 
+**Daily routine:** habits repeat automatically every day, so there is nothing to add each morning. Each habit can repeat every day, weekdays, weekends or any custom days. *Restore default habits* on the Habits tab brings back any starter habit you removed.
+
+**Friends:** find someone by exact email, send a request, and once they accept you can see their daily productive days (score only: week bars, 12-week heatmap, streaks). Habit names and details are never shared. People can switch off discovery. Shared scores live in `scores/{uid}`; see the rules in `firestore.rules`.
+
 **Templates:** open *Browse templates* on the Today or Habits tab to add ready-made habits one at a time or a whole pack: pregnancy planning (her / him / together), morning routine, fitness, sleep, calm mind, learning, deep work, money and self care. Packs live in `src/lib/templates.ts`.
 
 **Stack:** React 18 + TypeScript + Vite · Framer Motion · Lucide icons · Firebase Auth + Firestore · vite-plugin-pwa
@@ -26,7 +30,7 @@ Habits can be edited, reordered (drag the handle) and deleted.
    ```bash
    npm i -g firebase-tools && firebase login
    firebase use --add          # pick your project
-   firebase deploy --only firestore:rules
+   firebase deploy --only firestore:rules   # re-run whenever firestore.rules changes (needed for Friends)
    ```
 
 ## 2. Run locally

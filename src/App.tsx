@@ -4,11 +4,13 @@ import type { User } from 'firebase/auth'
 import { isFirebaseConfigured } from './lib/firebase'
 import { useAuth } from './hooks/useAuth'
 import { DataProvider, useData } from './hooks/useData'
+import { FriendsProvider, useFriends } from './hooks/useFriends'
 import { useToday } from './hooks/useToday'
 import { TabBar, type Tab } from './components/TabBar'
 import { TodayPage } from './pages/TodayPage'
 import { InsightsPage } from './pages/InsightsPage'
 import { ManagePage } from './pages/ManagePage'
+import { FriendsPage } from './pages/FriendsPage'
 import { LoginPage } from './pages/LoginPage'
 import { SetupScreen } from './pages/SetupScreen'
 
@@ -24,6 +26,7 @@ function Shell({ user, onSignOut }: { user: User; onSignOut: () => void }) {
   const [tab, setTab] = useState<Tab>('today')
   const today = useToday()
   const { error } = useData()
+  const { incoming } = useFriends()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -49,11 +52,12 @@ function Shell({ user, onSignOut }: { user: User; onSignOut: () => void }) {
         >
           {tab === 'today' && <TodayPage user={user} today={today} onOpenAccount={() => setTab('manage')} />}
           {tab === 'insights' && <InsightsPage today={today} />}
+          {tab === 'friends' && <FriendsPage user={user} today={today} />}
           {tab === 'manage' && <ManagePage user={user} onSignOut={onSignOut} />}
         </motion.main>
       </AnimatePresence>
 
-      <TabBar tab={tab} onChange={setTab} />
+      <TabBar tab={tab} onChange={setTab} badges={{ friends: incoming.length }} />
     </div>
   )
 }
@@ -66,7 +70,9 @@ function Root() {
 
   return (
     <DataProvider uid={user.uid}>
-      <Shell user={user} onSignOut={signOut} />
+      <FriendsProvider user={user}>
+        <Shell user={user} onSignOut={signOut} />
+      </FriendsProvider>
     </DataProvider>
   )
 }

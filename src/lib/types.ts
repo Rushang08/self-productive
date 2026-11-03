@@ -12,6 +12,8 @@ export interface Habit {
   unit: string
   /** Amount added by the + / − buttons. */
   step: number
+  /** Days of the week it repeats on (0 = Sunday … 6 = Saturday). All seven = every day. */
+  days: number[]
   order: number
   /** Set when the habit was added from the template library. */
   templateId?: string

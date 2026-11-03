@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { BottomSheet } from './BottomSheet'
 import { COLORS } from '../lib/defaults'
 import { HabitIcon, ICON_KEYS } from '../lib/habitIcons'
+import { ALL_DAYS, DAY_LETTER, DAY_ORDER, DAY_SHORT, WEEKDAYS, WEEKENDS, scheduleLabel } from '../lib/schedule'
 import { useData } from '../hooks/useData'
 import type { Habit, HabitKind } from '../lib/types'
 
@@ -31,17 +32,18 @@ function FormBody({ habit, onClose }: { habit: Habit | null; onClose: () => void
   const [target, setTarget] = useState(String(habit?.target ?? 10))
   const [unit, setUnit] = useState(habit?.unit ?? '')
   const [step, setStep] = useState(String(habit?.step ?? 1))
+  const [days, setDays] = useState<number[]>(habit?.days ?? ALL_DAYS)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const targetN = Number(target)
   const stepN = Number(step)
   const valid =
-    name.trim().length > 0 && (kind === 'check' || (targetN > 0 && stepN > 0 && Number.isFinite(targetN) && Number.isFinite(stepN)))
+    name.trim().length > 0 && days.length > 0 && (kind === 'check' || (targetN > 0 && stepN > 0 && Number.isFinite(targetN) && Number.isFinite(stepN)))
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!valid) return
-    saveHabit({ id: habit?.id, name, icon, color, kind, target: targetN, unit, step: stepN })
+    saveHabit({ id: habit?.id, name, icon, color, kind, target: targetN, unit, step: stepN, days })
     onClose()
   }
 
@@ -92,6 +94,35 @@ function FormBody({ habit, onClose }: { habit: Habit | null; onClose: () => void
           </label>
         </motion.div>
       )}
+
+      <div className="field">
+        <span>Repeats · {days.length ? scheduleLabel(days) : 'Pick at least one day'}</span>
+        <div className="dow" role="group" aria-label="Days this habit repeats">
+          {DAY_ORDER.map((d) => (
+            <button
+              key={d}
+              type="button"
+              className={days.includes(d) ? 'on' : ''}
+              aria-pressed={days.includes(d)}
+              aria-label={DAY_SHORT[d]}
+              onClick={() => setDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))}
+            >
+              {DAY_LETTER[d]}
+            </button>
+          ))}
+        </div>
+        <div className="chips">
+          <button type="button" className="chip" onClick={() => setDays(ALL_DAYS)}>
+            Every day
+          </button>
+          <button type="button" className="chip" onClick={() => setDays(WEEKDAYS)}>
+            Weekdays
+          </button>
+          <button type="button" className="chip" onClick={() => setDays(WEEKENDS)}>
+            Weekends
+          </button>
+        </div>
+      </div>
 
       <div className="field">
         <span>Icon</span>
