@@ -24,7 +24,7 @@ export function HabitForm({ open, habit, onClose }: Props) {
 }
 
 function FormBody({ habit, onClose }: { habit: Habit | null; onClose: () => void }) {
-  const { saveHabit, removeHabit } = useData()
+  const { habits, saveHabit, removeHabit } = useData()
   const [name, setName] = useState(habit?.name ?? '')
   const [icon, setIcon] = useState(habit?.icon ?? 'target')
   const [color, setColor] = useState(habit?.color ?? COLORS[0])
@@ -37,8 +37,9 @@ function FormBody({ habit, onClose }: { habit: Habit | null; onClose: () => void
 
   const targetN = Number(target)
   const stepN = Number(step)
+  const duplicate = habits.some((h) => h.id !== habit?.id && h.name.trim().toLowerCase() === name.trim().toLowerCase())
   const valid =
-    name.trim().length > 0 && days.length > 0 && (kind === 'check' || (targetN > 0 && stepN > 0 && Number.isFinite(targetN) && Number.isFinite(stepN)))
+    name.trim().length > 0 && !duplicate && days.length > 0 && (kind === 'check' || (targetN > 0 && stepN > 0 && Number.isFinite(targetN) && Number.isFinite(stepN)))
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,6 +60,7 @@ function FormBody({ habit, onClose }: { habit: Habit | null; onClose: () => void
           autoFocus={!habit}
           onChange={(e) => setName(e.target.value)}
         />
+        {duplicate && <small className="field-err">You already have a habit with this name.</small>}
       </label>
 
       <div className="field">

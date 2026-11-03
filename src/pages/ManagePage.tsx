@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { ChevronRight, Download, GripVertical, LogOut, Plus, RotateCcw, Sparkles } from 'lucide-react'
+import { ChevronRight, Download, GripVertical, LogOut, Plus, RotateCcw, Sparkles, Trash2 } from 'lucide-react'
 import type { User } from 'firebase/auth'
 import { useData } from '../hooks/useData'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
@@ -15,6 +15,15 @@ import { Avatar } from '../components/Avatar'
 
 function Row({ habit, onEdit, onDrop }: { habit: Habit; onEdit: () => void; onDrop: () => void }) {
   const controls = useDragControls()
+  const { removeHabit } = useData()
+  const [armed, setArmed] = useState(false)
+
+  // Two taps to delete; the first one disarms itself after a few seconds.
+  useEffect(() => {
+    if (!armed) return
+    const t = window.setTimeout(() => setArmed(false), 3000)
+    return () => window.clearTimeout(t)
+  }, [armed])
   return (
     <Reorder.Item
       as="div"
@@ -41,6 +50,13 @@ function Row({ habit, onEdit, onDrop }: { habit: Habit; onEdit: () => void; onDr
           </small>
         </span>
         <ChevronRight size={18} className="chev" />
+      </button>
+      <button
+        className={`row-del ${armed ? 'armed' : ''}`}
+        onClick={() => (armed ? removeHabit(habit.id) : setArmed(true))}
+        aria-label={armed ? `Confirm delete ${habit.name}` : `Delete ${habit.name}`}
+      >
+        {armed ? 'Delete?' : <Trash2 size={17} />}
       </button>
     </Reorder.Item>
   )
@@ -107,8 +123,7 @@ export function ManagePage({ user, onSignOut }: Props) {
         )}
       </div>
       <p className="hint">
-        These repeat automatically, so there is nothing to set up each day. Tap a habit to change its goal or the days it repeats. Drag the
-        handle to reorder.
+        These repeat automatically, so there is nothing to set up each day. Tap a habit to change its goal or the days it repeats, or the bin to delete it. Drag the handle to reorder.
       </p>
 
       <h3 className="section-title">Account</h3>

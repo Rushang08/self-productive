@@ -1430,3 +1430,35 @@ button.habit:active {
   background: var(--paper);
   box-shadow: none;
 }
+
+/* ---------- delete + validation ---------- */
+.manage-main {
+  padding-right: 4px;
+}
+.row-del {
+  flex-shrink: 0;
+  min-width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  padding: 0 10px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.row-del:active {
+  background: var(--press);
+}
+.row-del.armed {
+  background: var(--danger);
+  color: #fff;
+}
+.field-err {
+  color: var(--danger);
+  font-size: 12.5px;
+}
